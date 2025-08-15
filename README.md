@@ -29,3 +29,5 @@ curl.exe -X POST "http://127.0.0.1:5000/todos" -H "Content-Type: application/jso
 # DELETE (posición 0)
 curl.exe -X DELETE "http://127.0.0.1:5000/todos/0"
 
+
+(redeploy)
