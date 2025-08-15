@@ -1,14 +1,33 @@
 from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
+import json, os
 
 app = Flask(__name__)
 CORS(app)
 
-# Estado en memoria (se pierde al reiniciar)
-todos = [
-    {"done": True, "label": "Sample Todo 1"},
-    {"done": True, "label": "Sample Todo 2"},
-]
+DATA_FILE = "todos.json"
+
+def load_todos():
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+def save_todos(items):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+
+# Carga inicial
+todos = load_todos()
+if not todos:
+    todos = [
+        {"done": True, "label": "Sample Todo 1"},
+        {"done": True, "label": "Sample Todo 2"},
+    ]
+    save_todos(todos)
 
 @app.get("/todos")
 def get_todos():
@@ -27,6 +46,7 @@ def add_todo():
 
     todo = {"done": data["done"], "label": label}
     todos.append(todo)
+    save_todos(todos)
     return jsonify(todos), 201
 
 @app.delete("/todos/<int:position>")
@@ -34,6 +54,7 @@ def delete_todo(position):
     if position < 0 or position >= len(todos):
         abort(404, description="No existe un todo en esa posición")
     todos.pop(position)
+    save_todos(todos)
     return jsonify(todos), 200
 
 @app.errorhandler(400)
