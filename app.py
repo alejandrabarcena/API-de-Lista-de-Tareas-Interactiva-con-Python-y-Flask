@@ -1,14 +1,13 @@
 from flask import Flask, request, jsonify, abort, send_from_directory
 from flask_cors import CORS
-import json, os, pathlib
+import json, os
 
 app = Flask(__name__)
-CORS(app)  # CORS abierto
+CORS(app)  # habilita CORS
 
 # --- Persistencia JSON (local) ---
 DATA_FILE = "todos.json"
-BASE_DIR = pathlib.Path(__file__).resolve().parent
-PUBLIC_DIR = BASE_DIR / "public"
+PUBLIC_DIR = os.path.join(os.path.dirname(__file__), "public")
 
 def load_todos():
     if not os.path.exists(DATA_FILE):
