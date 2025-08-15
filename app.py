@@ -20,7 +20,7 @@ def save_todos(items):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(items, f, ensure_ascii=False, indent=2)
 
-# Carga inicial
+# Carga inicial (si no hay datos, sembramos samples)
 todos = load_todos()
 if not todos:
     todos = [
@@ -29,6 +29,7 @@ if not todos:
     ]
     save_todos(todos)
 
+# --- Endpoints del tutorial ---
 @app.get("/todos")
 def get_todos():
     return jsonify(todos), 200
@@ -57,6 +58,16 @@ def delete_todo(position):
     save_todos(todos)
     return jsonify(todos), 200
 
+# --- Rutas extra útiles (raíz y health) ---
+@app.get("/")
+def root():
+    return jsonify({"ok": True, "hint": "usa /todos"}), 200
+
+@app.get("/health")
+def health():
+    return jsonify({"ok": True}), 200
+
+# --- Manejadores de error bonitos ---
 @app.errorhandler(400)
 def bad_request(e):
     return jsonify(error="bad_request", message=e.description), 400
@@ -66,4 +77,5 @@ def not_found(e):
     return jsonify(error="not_found", message=e.description), 404
 
 if __name__ == "__main__":
+    # En Render/producción usarás gunicorn con Procfile
     app.run(debug=True)
