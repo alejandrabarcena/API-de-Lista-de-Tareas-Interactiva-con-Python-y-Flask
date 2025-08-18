@@ -47,7 +47,6 @@ curl -X POST http://127.0.0.1:5000/todos \
 
 # Borrar la primera
 curl -X DELETE http://127.0.0.1:5000/todos/0
-
 Deploy en Render
 
 Build Command: pip install -r requirements.txt
