@@ -1,78 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ToDo Front Minimal</title>
+  <meta charset="UTF-8">
+  <title>Lista de Tareas - Patsy 🐾</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
-    h1 { margin-bottom: .5rem; }
-    form { display:flex; gap:.5rem; margin:1rem 0; }
-    input[type=text] { flex:1; padding:.5rem; }
-    button { padding:.5rem .9rem; cursor:pointer; }
-    ul { list-style: none; padding: 0; }
-    li { display:flex; align-items:center; gap:.5rem; padding:.5rem 0; border-bottom:1px solid #eee; }
-    .done { opacity:.6; text-decoration: line-through; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #fdfdfd;
+      color: #333;
+      margin: 2rem;
+    }
+    h1 {
+      color: #6a1b9a;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #f3e5f5;
+      margin: 5px 0;
+      padding: 8px 12px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    li.done {
+      text-decoration: line-through;
+      color: #777;
+    }
+    button {
+      margin-left: 10px;
+      padding: 4px 8px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .delete {
+      background: #e53935;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <h1>ToDo Front Minimal</h1>
+  <h1>🐶 Lista de Tareas de Patsy</h1>
 
-  <form id="form">
-    <input id="label" type="text" placeholder="Nueva tarea..." />
-    <label><input id="isDone" type="checkbox" /> done</label>
-    <button type="submit">Agregar</button>
+  <form id="todoForm">
+    <input id="labelInput" type="text" placeholder="Escribe una tarea..." required />
+    <button type="submit">➕ Agregar</button>
   </form>
 
-  <ul id="list"></ul>
+  <ul id="todoList"></ul>
 
   <script>
-    // URL fija a tu backend en Render
-    const API = "https://srv-d2fpjk24d50c73b4dql0.onrender.com";
+    const API = window.location.origin; // ejemplo: http://127.0.0.1:5000
+    const list = document.getElementById("todoList");
+    const form = document.getElementById("todoForm");
+    const input = document.getElementById("labelInput");
 
-    async function fetchTodos() {
+    // Obtener todos los todos
+    async function loadTodos() {
       const res = await fetch(`${API}/todos`);
-      const data = await res.json();
-      render(data);
+      const todos = await res.json();
+      renderTodos(todos);
     }
 
-    function render(items) {
-      const ul = document.getElementById('list');
-      ul.innerHTML = '';
-      items.forEach((t, idx) => {
-        const li = document.createElement('li');
-        const span = document.createElement('span');
-        span.textContent = t.label;
-        if (t.done) span.classList.add('done');
+    // Renderiza lista
+    function renderTodos(todos) {
+      list.innerHTML = "";
+      todos.forEach((t, i) => {
+        const li = document.createElement("li");
+        li.className = t.done ? "done" : "";
+        li.textContent = t.label;
 
-        const del = document.createElement('button');
-        del.textContent = 'Eliminar';
-        del.onclick = async () => {
-          await fetch(`${API}/todos/${idx}`, { method: 'DELETE' });
-          fetchTodos();
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "🗑️";
+        delBtn.className = "delete";
+        delBtn.onclick = async () => {
+          await fetch(`${API}/todos/${i}`, { method: "DELETE" });
+          loadTodos();
         };
 
-        li.append(span, del);
-        ul.appendChild(li);
+        li.appendChild(delBtn);
+        list.appendChild(li);
       });
     }
 
-    document.getElementById('form').addEventListener('submit', async (e) => {
+    // Agregar tarea
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const label = document.getElementById('label').value.trim();
-      const done = document.getElementById('isDone').checked;
+      const label = input.value.trim();
       if (!label) return;
       await fetch(`${API}/todos`, {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ done, label })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label, done: false })
       });
-      document.getElementById('label').value = '';
-      document.getElementById('isDone').checked = false;
-      fetchTodos();
+      input.value = "";
+      loadTodos();
     });
 
-    fetchTodos();
+    // Inicial
+    loadTodos();
   </script>
 </body>
 </html>
