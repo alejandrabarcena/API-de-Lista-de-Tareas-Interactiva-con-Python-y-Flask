@@ -1,8 +1,28 @@
+# Entorno virtual de Python
 venv/
+ENV/
+env/
+.venv/
+
+# Archivos compilados y caché de Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Configuración local y variables de entorno
 .env
 
-body.json
+# Archivos de base de datos locales
+*.db
+*.sqlite
+*.sqlite3
+todos.db
 
+# Archivos temporales / ejemplos
+body.json
 todos.json
+
+# Archivos de sistema (Windows / Mac)
+.DS_Store
+Thumbs.db
